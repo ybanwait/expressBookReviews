@@ -46,7 +46,7 @@ regd_users.post("/login", (req,res) => {
 
   let accessToken = jwt.sign({
     data: password
-  }, "access", {expiresIn: 60 * 60});
+  }, "access", {expiresIn: "2h"});
 
   req.session.authorization={accessToken, username};
   return res.status(200).json({message: "User logged in successfully"});
@@ -54,8 +54,24 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    
+    let isbn = req.params.isbn;
+    let review = req.body.review;
+    let user = req.session.authorization.username;
+  
+    if(!books[isbn]) {
+    return res.status(404).json({message: `Could not find the book with ISBN: ${isbn}`});
+    }
+    
+    if(books[isbn].reviews[user]) {
+        msg="review updated";
+    }else{
+        msg="review added";
+    }
+    
+    books[isbn].reviews[user]=review;
+    return res.status(201).json({message: msg});
+  
 });
 
 module.exports.authenticated = regd_users;

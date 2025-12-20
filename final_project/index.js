@@ -8,11 +8,12 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
+app.use("/customer",session({secret:"fingerprint_customer",resave: false, saveUninitialized: false}))
 
 app.use("/customer/auth/*", function auth(req,res,next){
+    
     if (req.session.authorization) {
-        let token = req.session.authorization("accessToken");
+        let token = req.session.authorization.accessToken;
 
         //verify access token
         jwt.verify(token, "access", (err, user) => {
@@ -23,6 +24,8 @@ app.use("/customer/auth/*", function auth(req,res,next){
                 return res.status(403).json({message: "User not authenticated"});
             }
         });
+    }else{
+        return res.status(403).json({message: "Unauthorized"});
     }
 
 });
