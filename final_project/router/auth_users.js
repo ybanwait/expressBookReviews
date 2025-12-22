@@ -60,7 +60,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     let user = req.session.authorization.username;
   
     if(!books[isbn]) {
-    return res.status(404).json({message: `Could not find the book with ISBN: ${isbn}`});
+        return res.status(404).json({message: `Could not find the book with ISBN: ${isbn}`});
     }
     
     if(books[isbn].reviews[user]) {
@@ -72,6 +72,20 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     books[isbn].reviews[user]=review;
     return res.status(201).json({message: msg});
   
+});
+
+// Add a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    let isbn = req.params.isbn;
+    let user = req.session.authorization.username;
+
+    if(!books[isbn]) {
+        return res.status(404).json({message: `Could not find the book with ISBN: ${isbn}`});
+    }
+
+    delete books[isbn].reviews[user];
+    return res.status(201).json({message: `Review of user: ${user} removed from isbn: ${isbn} `});
+
 });
 
 module.exports.authenticated = regd_users;
